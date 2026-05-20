@@ -51,6 +51,7 @@ function freshSeed(): Store {
 }
 
 let writeLock: Promise<void> = Promise.resolve();
+let memoryStore: Store | null = null; // Used when the filesystem is read-only (e.g. Vercel)
 
 async function ensureStore(): Promise<Store> {
   try {
@@ -66,16 +67,27 @@ async function ensureStore(): Promise<Store> {
       contact_messages: parsed.contact_messages ?? seed.contact_messages,
     };
   } catch {
+    if (memoryStore) return memoryStore;
     const seed = freshSeed();
-    await fs.mkdir(DATA_DIR, { recursive: true });
-    await fs.writeFile(DATA_FILE, JSON.stringify(seed, null, 2), 'utf8');
+    try {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+      await fs.writeFile(DATA_FILE, JSON.stringify(seed, null, 2), 'utf8');
+    } catch {
+      // Read-only filesystem (e.g. Vercel serverless). Use in-memory fallback.
+      memoryStore = seed;
+    }
     return seed;
   }
 }
 
 async function persistStore(store: Store): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(store, null, 2), 'utf8');
+  try {
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.writeFile(DATA_FILE, JSON.stringify(store, null, 2), 'utf8');
+  } catch {
+    // Read-only filesystem — keep changes in memory only (lost on restart).
+    memoryStore = store;
+  }
 }
 
 async function mutate(fn: (store: Store) => void | Promise<void>): Promise<Store> {

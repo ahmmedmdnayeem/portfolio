@@ -3,19 +3,19 @@
 export const SESSION_COOKIE = 'admin_session';
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
-function getSecret(): string {
+function getSecret(): string | null {
   const s = process.env.ADMIN_SESSION_SECRET;
-  if (!s || s.length < 16) {
-    throw new Error('ADMIN_SESSION_SECRET must be set (min 16 chars) in .env.local');
-  }
+  if (!s || s.length < 16) return null;
   return s;
 }
 
-async function importHmacKey(): Promise<CryptoKey> {
+async function importHmacKey(): Promise<CryptoKey | null> {
+  const s = getSecret();
+  if (!s) return null;
   const enc = new TextEncoder();
   return crypto.subtle.importKey(
     'raw',
-    enc.encode(getSecret()),
+    enc.encode(s),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign', 'verify'],
@@ -66,6 +66,9 @@ export async function createSessionToken(email: string): Promise<string> {
   const expires = Date.now() + MAX_AGE_SECONDS * 1000;
   const payload = `${email}:${expires}`;
   const key = await importHmacKey();
+  if (!key) {
+    throw new Error('ADMIN_SESSION_SECRET is not configured (set a value of at least 16 chars).');
+  }
   const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload));
   return `${base64UrlEncode(payload)}.${bytesToHex(sig)}`;
 }
@@ -85,6 +88,7 @@ export async function verifySessionToken(
   }
 
   const key = await importHmacKey();
+  if (!key) return null; // No secret configured → treat as invalid token, never throw
   const expected = new Uint8Array(
     await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload)),
   );

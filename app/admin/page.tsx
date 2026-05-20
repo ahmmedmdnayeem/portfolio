@@ -1,12 +1,44 @@
 import Link from 'next/link';
 import { FolderKanban, Mail, Sparkles, Award, Briefcase, MessageSquareQuote } from 'lucide-react';
-import { isSupabaseConfigured } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { listTable } from '@/lib/store/local';
 import type { ContactMessage } from '@/lib/types/database';
 
 export const dynamic = 'force-dynamic';
 
 async function getStats() {
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = createClient();
+      const [projects, skills, experience, certifications, testimonials, messagesRes] =
+        await Promise.all([
+          supabase.from('projects').select('*', { count: 'exact', head: true }),
+          supabase.from('skills').select('*', { count: 'exact', head: true }),
+          supabase.from('experience').select('*', { count: 'exact', head: true }),
+          supabase.from('certifications').select('*', { count: 'exact', head: true }),
+          supabase.from('testimonials').select('*', { count: 'exact', head: true }),
+          supabase
+            .from('contact_messages')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50),
+        ]);
+      const messages = (messagesRes.data ?? []) as ContactMessage[];
+      return {
+        projects: projects.count ?? 0,
+        skills: skills.count ?? 0,
+        experience: experience.count ?? 0,
+        certifications: certifications.count ?? 0,
+        testimonials: testimonials.count ?? 0,
+        unread: messages.filter((m) => m.status === 'unread').length,
+        total: messages.length,
+        recent: messages.slice(0, 5),
+      };
+    } catch {
+      // fall through to local store
+    }
+  }
+
   const [projects, skills, messages, experience, certifications, testimonials] = await Promise.all([
     listTable('projects'),
     listTable('skills'),

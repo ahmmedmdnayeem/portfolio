@@ -6,18 +6,22 @@ import type { ContactMessage } from '@/lib/types/database';
 export const dynamic = 'force-dynamic';
 
 async function getMessages(): Promise<ContactMessage[]> {
-  if (!isSupabaseConfigured()) {
-    return listTable('contact_messages', { orderBy: 'created_at', desc: true });
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+      return (data as ContactMessage[]) ?? [];
+    } catch {
+      // fall through
+    }
   }
   try {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('contact_messages')
-      .select('*')
-      .order('created_at', { ascending: false });
-    return (data as ContactMessage[]) ?? [];
+    return await listTable('contact_messages', { orderBy: 'created_at', desc: true });
   } catch {
-    return listTable('contact_messages', { orderBy: 'created_at', desc: true });
+    return [];
   }
 }
 
