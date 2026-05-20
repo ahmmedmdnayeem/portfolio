@@ -30,7 +30,7 @@ export const SITE_CONFIG = {
   email: 'amnayeem.dev@gmail.com',
   description:
     'Ahmmed MD Nayeem — Top 1% Upwork & Fiverr freelancer from Bangladesh. Software engineer, Python developer, full-stack and Web3 builder. Crypto, Blockchain, BTC, Ethical Hacking and Cybersecurity enthusiast. Computer Science background, businessman and investor.',
-  url: 'https://ahmmednayeem.dev',
+  url: 'https://nayeemahmmed.com',
   timezone: 'GMT+6 (Dhaka, Bangladesh)',
   country: 'Bangladesh',
   birthYear: 2003, // 23 in 2026

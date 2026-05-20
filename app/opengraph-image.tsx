@@ -100,7 +100,7 @@ export default async function OGImage() {
               color: '#4a5568',
             }}
           >
-            ahmmednayeem.dev
+            nayeemahmmed.com
           </div>
         </div>
       </div>
