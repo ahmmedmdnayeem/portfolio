@@ -10,6 +10,10 @@ interface ProfileAvatarProps {
   size?: number;
   className?: string;
   glow?: boolean;
+  /** CSS object-position. Default 'center 20%' (face is in upper third of the source photo). */
+  objectPosition?: string;
+  /** Extra zoom — 1.6 means image is rendered 160% of its natural fit. Crops out edges to tighten on face. */
+  zoom?: number;
 }
 
 /**
@@ -23,6 +27,8 @@ export function ProfileAvatar({
   size = 144,
   className,
   glow = true,
+  objectPosition = 'center 22%',
+  zoom = 1.6,
 }: ProfileAvatarProps) {
   const [errored, setErrored] = useState(false);
   const showImage = src && !errored;
@@ -54,6 +60,11 @@ export function ProfileAvatar({
           priority
           onError={() => setErrored(true)}
           className="h-full w-full object-cover"
+          style={{
+            objectPosition,
+            transform: `scale(${zoom})`,
+            transformOrigin: objectPosition,
+          }}
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-bg-card via-bg-secondary to-bg-primary font-display text-3xl font-extrabold text-accent-green">
