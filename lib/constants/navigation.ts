@@ -19,6 +19,8 @@ export const SOCIAL_LINKS = [
 
 export const SITE_CONFIG = {
   name: 'Ahmmed MD Nayeem',
+  // Path under /public — leave blank to show the placeholder avatar.
+  profileImage: '/profile.jpg',
   alternateNames: [
     'Nayeem Ahmmed',
     'MD Nayeem Ahmmed',

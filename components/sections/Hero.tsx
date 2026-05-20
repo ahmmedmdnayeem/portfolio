@@ -4,6 +4,8 @@ import { NeonButton } from '@/components/ui/NeonButton';
 import { Typewriter } from '@/components/ui/Typewriter';
 import { MatrixBackground } from '@/components/ui/MatrixBackground';
 import { StatCounter } from '@/components/ui/StatCounter';
+import { ProfileAvatar } from '@/components/ui/ProfileAvatar';
+import { SITE_CONFIG } from '@/lib/constants/navigation';
 
 export function Hero() {
   return (
@@ -15,6 +17,13 @@ export function Hero() {
 
       <div className="relative z-20 mx-auto w-full max-w-7xl px-6 py-16">
         <div className="flex flex-col items-center text-center">
+          <ProfileAvatar
+            src={SITE_CONFIG.profileImage}
+            alt={SITE_CONFIG.name}
+            size={148}
+            className="mb-6"
+          />
+
           <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent-green bg-accent-green/10 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-accent-green">
             <span className="h-2 w-2 animate-blink rounded-full bg-accent-green shadow-glow-green" />
             Open to Internships & Entry-Level Roles
