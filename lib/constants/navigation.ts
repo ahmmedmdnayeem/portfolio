@@ -19,9 +19,28 @@ export const SOCIAL_LINKS = [
 
 export const SITE_CONFIG = {
   name: 'Ahmmed MD Nayeem',
-  handle: 'NAYEM_',
-  email: 'engr.amnaibd@gmail.com',
-  description: 'Top 1% Upwork freelancer ($100K+ in marketing revenue) now pivoting into software engineering. Python, full-stack, blockchain fundamentals. Trilingual. Seeking entry-level / internship roles.',
+  alternateNames: [
+    'Nayeem Ahmmed',
+    'MD Nayeem Ahmmed',
+    'Ahmed Nayem',
+    'Nayem Ahmed',
+    'AMN',
+  ],
+  handle: 'NAYEEM_',
+  email: 'amnayeem.dev@gmail.com',
+  description:
+    'Ahmmed MD Nayeem — Top 1% Upwork & Fiverr freelancer from Bangladesh. Software engineer, Python developer, full-stack and Web3 builder. Crypto, Blockchain, BTC, Ethical Hacking and Cybersecurity enthusiast. Computer Science background, businessman and investor.',
   url: 'https://ahmmednayeem.dev',
-  timezone: 'GMT+6 (Dhaka)',
+  timezone: 'GMT+6 (Dhaka, Bangladesh)',
+  country: 'Bangladesh',
+  birthYear: 2003, // 23 in 2026
+  jobTitle: 'Software Engineer · Full-Stack Developer · Python Developer · Freelancer',
+  socials: {
+    twitter: 'https://x.com/ahmmednayeem',
+    github: 'https://github.com/ahmmedmdnayeem',
+    linkedin: 'https://linkedin.com/in/ahmmednayeem',
+    telegram: 'https://t.me/ahmmednayeem',
+    upwork: 'https://www.upwork.com/freelancers/ahmmednayeem',
+    fiverr: 'https://www.fiverr.com/ahmmednayeem',
+  },
 } as const;
