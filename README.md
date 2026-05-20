@@ -1,135 +1,156 @@
 # Ahmmed MD Nayeem — Portfolio
 
-Personal portfolio for a marketer-turned-engineer: Top 1% Upwork freelancer ($100K+ in marketing revenue) pivoting into software engineering — Python, full-stack, blockchain fundamentals. Trilingual (Bangla · English · 中文).
-**Next.js 14 (App Router) · TypeScript · Supabase · Tailwind CSS · Framer Motion**
+[![Live](https://img.shields.io/badge/live-nayeemahmmed.com-00ff88?style=flat-square)](https://nayeemahmmed.com)
+[![Stack](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org)
+[![Stack](https://img.shields.io/badge/Supabase-postgres-3ecf8e?style=flat-square&logo=supabase)](https://supabase.com)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-Cyberpunk / terminal hacker aesthetic — deep blacks, neon green/cyan accents, glitch text, scanlines, matrix background.
+Personal portfolio for **Ahmmed MD Nayeem** — a Top 1% Upwork freelancer from Bangladesh pivoting into software engineering. Trilingual (Bangla · English · 中文). Open to internship & entry-level roles.
+
+**Stack:** Next.js 14 (App Router) · TypeScript · Tailwind · Framer Motion · Supabase (Postgres + Auth)
+
+## Live
+
+🌐 https://nayeemahmmed.com
 
 ---
 
-## Quick Start
+## Quick start
 
 ```bash
-cd Portfolio
+git clone https://github.com/ahmmedmdnayeem/portfolio.git
+cd portfolio
 npm install
-cp .env.local.example .env.local   # fill in Supabase keys (optional for first run)
-npm run dev
+cp .env.local.example .env.local   # fill in your own Supabase keys
+npm run dev                        # → http://localhost:3000
 ```
 
-Site runs at http://localhost:3000.
-
-> The app ships with **fallback seed data** in [`lib/constants/fallback-data.ts`](lib/constants/fallback-data.ts), so it renders fully even with no Supabase credentials. Admin routes require Supabase auth and will be unavailable until configured.
+> The app runs even without Supabase configured — it falls back to seed data in [lib/constants/fallback-data.ts](lib/constants/fallback-data.ts) and an in-memory store, so first-run preview "just works."
 
 ---
 
-## Project Structure
+## Features
+
+### Public site
+- 🚀 Hero with glitch text + matrix background + typewriter subtitle
+- 👤 Circular profile photo with neon-glow ring
+- 📜 About, Skills, Projects, Experience, Certifications, Languages, Testimonials, Contact sections
+- 📧 Contact form persisting to Supabase (or local store) + rate-limited
+- 🌐 Trilingual language showcase (Bangla · English · 中文)
+- 🎨 Cyberpunk aesthetic — scanlines, glitch animation, terminal cards
+
+### Admin CMS (`/admin`)
+- 🔐 Supabase Auth login (primary) + HMAC-signed cookie session (fallback)
+- 📦 CRUD for projects, skills, experience, certifications, testimonials
+- 📥 Inbox for contact form submissions (mark read/replied/archived)
+- 📊 Dashboard with stats overview
+
+### SEO
+- 📑 Rich JSON-LD (Person, WebSite, ProfilePage, BreadcrumbList)
+- 🖼 Dynamic Open Graph image generated at `/opengraph-image`
+- 🗺 Sitemap + robots.txt via Next.js metadata routes
+- 📲 PWA manifest
+
+### Security
+- 🛡 HSTS, CSP, X-Frame-Options DENY, no-fingerprint headers
+- 🔒 Timing-safe credential check
+- 🔑 Supabase RLS restricts writes to admin email allowlist
+- 🚫 No `X-Powered-By` header
+
+---
+
+## Architecture
 
 ```
 Portfolio/
 ├── app/
-│   ├── layout.tsx              # Root layout + metadata + fonts
-│   ├── page.tsx                # Public homepage (Server Component)
-│   ├── globals.css             # CSS variables + glitch / scanline / noise
-│   ├── login/page.tsx          # Admin login
-│   ├── admin/                  # Auth-protected admin (dashboard, projects, messages, skills)
+│   ├── layout.tsx                  # Root layout + metadata + fonts
+│   ├── page.tsx                    # Public homepage (Server Component)
+│   ├── globals.css                 # CSS vars + glitch + scanline + noise
+│   ├── opengraph-image.tsx         # Dynamic OG image (1200x630)
+│   ├── icon.tsx                    # Dynamic favicon
+│   ├── sitemap.ts / robots.ts / manifest.ts
+│   ├── not-found.tsx               # Custom 404 page
+│   ├── login/page.tsx              # Admin login
+│   ├── admin/                      # Auth-protected admin pages
 │   └── api/
-│       ├── contact/route.ts    # Contact form handler (rate-limited)
-│       └── revalidate/route.ts # ISR revalidation webhook
+│       ├── contact/                # Public contact form handler
+│       ├── auth/{login,logout}/    # Local session endpoints
+│       └── admin/[resource]/       # Admin CRUD (Supabase or local store)
 ├── components/
-│   ├── layout/                 # Navbar, Footer
-│   ├── sections/               # Hero, About, Skills, Projects, Experience, Certifications, Testimonials, Contact
-│   ├── ui/                     # GlitchText, TerminalCard, NeonButton, ProjectCard, SkillBadge, MatrixBackground, Typewriter, StatCounter, SectionHeading
-│   └── admin/                  # ProjectsManager, MessageList, SkillsManager, LogoutButton
+│   ├── layout/                     # Navbar, Footer
+│   ├── sections/                   # Hero, About, Skills, ... , Languages, Contact
+│   ├── ui/                         # GlitchText, TerminalCard, NeonButton, ProfileAvatar, ...
+│   ├── admin/                      # ProjectsManager, MessageList, SkillsManager, ...
+│   └── seo/JsonLd.tsx              # Structured data
 ├── lib/
-│   ├── supabase/               # client.ts, server.ts, middleware.ts, queries.ts
-│   ├── types/database.ts       # All table row types + Database type
-│   ├── utils/                  # cn, formatDate
-│   └── constants/              # navigation + fallback seed data
-├── hooks/useScrollSpy.ts       # Active nav section detection
-├── middleware.ts               # Protects /admin/* routes
-└── supabase/
-    ├── migrations/001_initial_schema.sql
-    └── seed.sql
+│   ├── supabase/                   # client / server / middleware / queries
+│   ├── store/local.ts              # JSON-file store (offline fallback)
+│   ├── auth/                       # local.ts (HMAC sessions) + check.ts (isAdmin)
+│   ├── admin/api.ts                # Admin REST client
+│   ├── types/database.ts           # All row types
+│   ├── utils/ + constants/         # Helpers, navigation, fallback seed data
+├── hooks/useScrollSpy.ts
+├── middleware.ts                   # Protects /admin/*
+├── scripts/                        # Supabase setup helpers
+└── supabase/migrations/            # SQL schema + RLS policies
 ```
 
 ---
 
-## Supabase Setup
+## Supabase setup
 
-1. Create a project at https://supabase.com.
-2. In **SQL Editor**, run `supabase/migrations/001_initial_schema.sql`.
-3. Optionally run `supabase/seed.sql` for sample data.
-4. Copy the project URL + anon key into `.env.local`.
-5. Create an admin user in **Authentication → Users** (email + password).
-6. Restart the dev server. `/admin` will now be live after login.
+If you want a real backend:
 
-### Environment variables
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...           # optional, for server-side admin tools
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-REVALIDATE_SECRET=long-random-string    # for /api/revalidate webhook
-RESEND_API_KEY=                          # optional, for email notifications
-```
-
----
-
-## Tables
-
-| Table | Purpose |
-|---|---|
-| `projects` | Portfolio entries with category, tech stack, featured flag |
-| `skills` | Categorized skill list with proficiency 0–100 |
-| `experience` | Career timeline with responsibilities + tech |
-| `certifications` | Industry credentials |
-| `testimonials` | Client feedback with platform + rating |
-| `contact_messages` | Inbound form submissions |
-| `site_stats` | Optional analytics counters |
-
-Row Level Security: public read on portfolio tables, public insert on `contact_messages`, full access for `authenticated` role.
-
----
-
-## Admin
-
-- Login: `/login`
-- Dashboard: `/admin`
-- Projects CRUD: `/admin/projects`
-- Messages: `/admin/messages` — status workflow (unread → read → replied → archived)
-- Skills CRUD: `/admin/skills`
-
-Auth uses Supabase email/password. Create the user via Supabase dashboard.
-
----
-
-## Customizing
-
-- **Personal info / social links**: [`lib/constants/navigation.ts`](lib/constants/navigation.ts)
-- **Color palette**: [`tailwind.config.ts`](tailwind.config.ts) + CSS vars in [`app/globals.css`](app/globals.css)
-- **Fallback / seed content**: [`lib/constants/fallback-data.ts`](lib/constants/fallback-data.ts) + [`supabase/seed.sql`](supabase/seed.sql)
-- **Glitch / scanline animations**: [`app/globals.css`](app/globals.css)
+1. Create a project at https://supabase.com
+2. Run [supabase/migrations/001_initial_schema.sql](supabase/migrations/001_initial_schema.sql) in the SQL Editor — creates 7 tables + RLS policies
+3. Run [supabase/migrations/002_extend_skill_categories.sql](supabase/migrations/002_extend_skill_categories.sql)
+4. Run [supabase/migrations/003_restrict_admin_to_specific_user.sql](supabase/migrations/003_restrict_admin_to_specific_user.sql) — locks admin writes to a specific email (edit the file to use yours)
+5. Fill `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://<proj>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<eyJ...>
+   SUPABASE_SERVICE_ROLE_KEY=<eyJ...>
+   ADMIN_SESSION_SECRET=<random 64-hex-char string>
+   ADMIN_EMAIL=you@example.com
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   ```
+6. Seed data + create admin user:
+   ```bash
+   npm run setup:supabase
+   ```
+7. **Disable public sign-ups** in Supabase: Authentication → Providers → Email → toggle "Enable Sign Up" off
 
 ---
 
 ## Deploy to Vercel
 
-1. Push to GitHub.
-2. Import into Vercel.
-3. Add env vars in Project Settings.
-4. Deploy.
-
-ISR is configured with `export const revalidate = 3600` on the home page, plus a `/api/revalidate` webhook you can call from a Supabase trigger to invalidate on data changes.
+1. Push to GitHub
+2. Vercel → New Project → Import the repo
+3. Add the env vars from `.env.local` (except `ADMIN_PASSWORD` — leave it out)
+4. Deploy
+5. After deploy, set `NEXT_PUBLIC_SITE_URL` to your production URL → redeploy
+6. Add your domain in **Vercel → Settings → Domains** + update Supabase **Authentication → URL Configuration**
 
 ---
 
 ## Scripts
 
 ```bash
-npm run dev          # dev server
-npm run build        # production build
-npm run start        # serve production build
-npm run type-check   # tsc --noEmit
-npm run lint         # next lint
+npm run dev               # Dev server
+npm run build             # Production build
+npm run start             # Serve production build
+npm run type-check        # tsc --noEmit
+npm run lint              # next lint
+
+npm run apply:schema      # Apply schema via direct DB connection (needs SUPABASE_DB_URL)
+npm run migrate:supabase  # Push data/portfolio.json → Supabase
+npm run create:admin      # Create / update the Supabase admin auth user
+npm run setup:supabase    # migrate:supabase && create:admin
 ```
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).

@@ -1,4 +1,4 @@
-import { ArrowRight, Download, ChevronDown } from 'lucide-react';
+import { ArrowRight, Mail, ChevronDown } from 'lucide-react';
 import { GlitchText } from '@/components/ui/GlitchText';
 import { NeonButton } from '@/components/ui/NeonButton';
 import { Typewriter } from '@/components/ui/Typewriter';
@@ -60,7 +60,7 @@ export function Hero() {
               View Work <ArrowRight className="h-4 w-4" />
             </NeonButton>
             <NeonButton href="#contact" variant="cyan" size="lg">
-              Let&apos;s Connect <Download className="h-4 w-4" />
+              Let&apos;s Connect <Mail className="h-4 w-4" />
             </NeonButton>
           </div>
 

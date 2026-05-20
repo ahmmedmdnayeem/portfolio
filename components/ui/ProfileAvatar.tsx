@@ -26,13 +26,15 @@ export function ProfileAvatar({
 }: ProfileAvatarProps) {
   const [errored, setErrored] = useState(false);
   const showImage = src && !errored;
-  const initials = alt
-    .split(' ')
-    .map((s) => s[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  // First + last initial, skipping common middle/honorific tokens (MD, JR, SR, MR, etc.)
+  const SKIP = new Set(['md', 'mr', 'mrs', 'jr', 'sr', 'dr', 'ii', 'iii']);
+  const tokens = alt.split(/\s+/).filter((t) => t && !SKIP.has(t.toLowerCase()));
+  const initials =
+    tokens.length === 0
+      ? '?'
+      : tokens.length === 1
+        ? tokens[0].slice(0, 2).toUpperCase()
+        : `${tokens[0][0]}${tokens[tokens.length - 1][0]}`.toUpperCase();
 
   return (
     <div
